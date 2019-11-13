@@ -44,13 +44,13 @@ public class FPSWalkerEnhanced : MonoBehaviour
     private CharacterController controller;
     private Transform myTransform;
     private float speed;
-    private RaycastHit hit;
+    private RaycastHit hit;                 //zzz
     private float fallStartLevel;
     private bool falling;
     private float slideLimit;
-    private float rayDistance;
-    private Vector3 contactPoint;
-    private bool playerControl = false;
+    private float rayDistance;              //zzz
+    private Vector3 contactPoint;           //zzz
+    private bool playerControl = false;     //zzz
     private int jumpTimer;
 
     void Start()
@@ -143,7 +143,7 @@ public class FPSWalkerEnhanced : MonoBehaviour
         }
 
         // Apply gravity
-        moveDirection.y -= gravity * Time.deltaTime;
+        moveDirection.y -= gravity * Time.deltaTime;  //added
 
         // Move the controller, and set grounded true or false depending on whether we're standing on something
         grounded = (controller.Move(moveDirection * Time.deltaTime) & CollisionFlags.Below) != 0;
