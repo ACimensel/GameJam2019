@@ -8,11 +8,14 @@ public class PlayerMovement : MonoBehaviour {
     private Rigidbody rb; //do i need?
     private Vector3 moveDirection = Vector3.zero;
     private CharacterController controller;
-    private Transform myTransform;
-
+    private Transform myTransform; 
     private bool grounded = false;
     private float speed;
+    private Animator animator;
 
+
+
+    public Transform groundCheck;
     public float walkSpeed = 6.0f;
     public float runSpeed = 11.0f;
     public float turnSpd = 5.0f;
@@ -23,36 +26,61 @@ public class PlayerMovement : MonoBehaviour {
     void Start () {
         cam = Camera.main;
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
 
         myTransform = transform;
         speed = runSpeed;
     }
 
     // Update is called once per frame
+    void Update()
+    {
+        
+        grounded = Physics.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
+        
+        if ((Input.GetKeyDown("space")) && (grounded))
+        {
+            print(grounded);
+            rb.AddForce(new Vector3(0, 20, 0) * jumpSpeed);
+            animator.SetTrigger("Jump");
+            grounded = false; //so you can jump only once
+        }
+
+    }
+
+    // Update is called once per frame
     void FixedUpdate ()
     {
         float inputX = Input.GetAxis("Horizontal");
-        //float inputY = Input.GetAxis("Vertical");
+        float inputY = Input.GetAxis("Vertical");
 
         // Apply gravity
         //moveDirection.y -= gravity * Time.deltaTime;
 
         //Makes player move forward at a constant speed
-        transform.Translate(0f, 0f, runSpeed * Time.deltaTime);
+        transform.Translate(0f, 0f, runSpeed * Time.deltaTime * inputY);
 
         //Rotates the player using A and D
         transform.Rotate(0, inputX * turnSpd*20.0f * Time.deltaTime, 0);
-        
-        //Outputs what object was clicked on, in the main camera view
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit))
+
+
+        /*void PrintClickedObject()
+        {
+            //Outputs what object was clicked on, in the main camera view
+            if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("We hit " + hit.collider.name + " " + hit.point);
+                Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+                RaycastHit hit;
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    Debug.Log("We hit " + hit.collider.name + " " + hit.point);
+                }
             }
-        }
+        }*/
     }
+
+
+    
 }
