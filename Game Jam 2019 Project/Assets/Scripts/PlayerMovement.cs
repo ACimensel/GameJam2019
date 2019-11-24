@@ -9,24 +9,26 @@ public class PlayerMovement : MonoBehaviour {
     private Vector3 moveDirection = Vector3.zero;
     private CharacterController controller;
     private Transform myTransform; 
-    private bool grounded = false;
+    private bool grounded = true;
     private float speed;
     private Animator animator;
 
 
 
     public Transform groundCheck;
-    public float walkSpeed = 6.0f;
     public float runSpeed = 11.0f;
     public float turnSpd = 5.0f;
-    public float jumpSpeed = 8.0f;
-    public float gravity = 20.0f;
+
+    private float jumpSpeed = 15.0f;
+    private float gravity = 20.0f;
+    private float verticalVelocity;
 
     // Use this for initialization
     void Start () {
         cam = Camera.main;
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        controller = GetComponent<CharacterController>();
 
         myTransform = transform;
         speed = runSpeed;
@@ -35,17 +37,22 @@ public class PlayerMovement : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-        
-        grounded = Physics.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
-        
-        if ((Input.GetKeyDown("space")) && (grounded))
-        {
-            print(grounded);
-            rb.AddForce(new Vector3(0, 20, 0) * jumpSpeed);
-            animator.SetTrigger("Jump");
-            grounded = false; //so you can jump only once
+        print(controller.isGrounded);
+
+        if (controller.isGrounded) {
+            verticalVelocity = gravity * Time.deltaTime;
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                verticalVelocity = jumpSpeed;
+                animator.SetTrigger("Jump");
+            }
+        }
+        else {
+            verticalVelocity -= gravity * Time.deltaTime;
         }
 
+        Vector3 moveVector = new Vector3(0, verticalVelocity, 0);
+        controller.Move(moveVector * Time.deltaTime);
     }
 
     // Update is called once per frame
